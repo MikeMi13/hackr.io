@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import React from 'react';
+import 'nprogress/nprogress.css';
 
 // show progress bar when page is loading
 Router.onRouteChangeStart = url => NProgress.start();
@@ -20,18 +21,12 @@ const Layout = ({ children }) => {
                 integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
                 crossorigin="anonymous">
             </link>
-            <link
-                rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css"
-                integrity="sha512-42kB9yDlYiCEfx2xVwq0q7hT4uf26FUgSIZBK8uiaEnTdShXjwr8Ip1V4xGJMg3mHkUt9nNuTDxunHF0/EgxLQ=="
-                crossorigin="anonymous"
-                referrerpolicy="no-referrer"
-            />
+            <link rel='stylesheet' href='/static/css/styles.css' />
         </React.Fragment>
     );
 
     const nav = () => (
-        <ul className="nav nav-tabs bg-success">
+        <ul className="nav nav-tabs bg-primary">
             <li className="nav-item">
                 <Link href="/">
                     <a className="nav-link text-white">
