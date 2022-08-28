@@ -13,7 +13,7 @@ const authRoutes = require('./routes/auth');
 // apply middlewares
 app.use(morgan('dev')); // dev mode
 app.use(bodyParser.json()); // parse JSON in request body
-app.use(cors()); // allow frontend to communicate with backend API
+app.use(cors({ origin: process.env.CLIENT_URL })); // allow frontend to communicate with backend API
 
 app.use('/api', authRoutes);
 
