@@ -1,4 +1,9 @@
 const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
 
@@ -6,6 +11,10 @@ const app = express();
 const authRoutes = require('./routes/auth');
 
 // apply middlewares
+app.use(morgan('dev')); // dev mode
+app.use(bodyParser.json()); // parse JSON in request body
+app.use(cors()); // allow frontend to communicate with backend API
+
 app.use('/api', authRoutes);
 
 const port = process.env.PORT || 8000;
