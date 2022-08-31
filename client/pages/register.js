@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Layout from "../components/Layout";
 import axios from 'axios';
+import { showSuccessMessage, showErrorMessage} from '../helpers/alerts';
 
 const Register = () => {
     const[state, setState] = useState({
@@ -23,13 +24,31 @@ const Register = () => {
         // prevent page from reloading
         event.preventDefault();
         //console.table({name, email, password});
+        setState({...state, buttonText: 'Registering...'});
         axios.post(`http://localhost:8000/api/register`, {
             name,
             email,
             password
         })
-        .then(response => console.log(response))
-        .catch(error => console.log(error));
+        .then(response => {
+            console.log(response);
+            setState({
+                ...state,
+                name: '',
+                email: '',
+                password: '',
+                buttonText: 'Submitted',
+                success: response.data.message
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            setState({
+                ...state,
+                buttonText: 'Register',
+                error: error.response.data.error
+            });
+        });
     };
 
     const registerForm = () => (
@@ -53,9 +72,9 @@ const Register = () => {
         <div className="col-md-6 offset-md-3">
             <h1>Register</h1>
             <br />
+            {success && showSuccessMessage(success)}
+            {error && showErrorMessage(error)}
             {registerForm()}
-            <hr />
-            {JSON.stringify(state)}
         </div>
     </Layout>;
 };

@@ -41,7 +41,7 @@ exports.register = (req, res) => {
             .catch(error => {
                 console.log('SES email on register error:', error);
                 res.json({
-                    error: `We could not verify your email. Please try again later.`
+                    message: `We could not verify your email. Please try again later.`
                 });
             });
     });
