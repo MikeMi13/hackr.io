@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
+import Router from "next/router";
 import axios from 'axios';
 import { showSuccessMessage, showErrorMessage } from '../helpers/alerts';
 import { API } from '../config';
+import { isAuth } from "../helpers/auth";
 
 const Register = () => {
     const[state, setState] = useState({
@@ -15,6 +17,11 @@ const Register = () => {
     });
 
     const { name, email, password, error, success, buttonText } = state;
+
+    useEffect(() => {
+        // if already logged in, don't want users to see the register page again
+        isAuth() && Router.push('/');
+    }, []);
 
     // this function returns another arrow function
     const handleChange = (field) => (event) => {

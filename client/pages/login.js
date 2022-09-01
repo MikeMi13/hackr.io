@@ -5,7 +5,7 @@ import Router from 'next/router';
 import axios from 'axios';
 import { showSuccessMessage, showErrorMessage } from '../helpers/alerts';
 import { API } from '../config';
-import { authenticate } from "../helpers/auth";
+import { authenticate, isAuth } from "../helpers/auth";
 
 const Login = () => {
     const[state, setState] = useState({
@@ -15,6 +15,11 @@ const Login = () => {
         success: '',
         buttonText: 'Login'
     });
+
+    useEffect(() => {
+        // if already logged in, don't want users to see the login page again
+        isAuth() && Router.push('/');
+    }, []);
 
     const { email, password, error, success, buttonText } = state;
 
@@ -34,8 +39,8 @@ const Login = () => {
             });
             //console.log(response);
             authenticate(response, () => {
-                // redirect
-                return Router.push('/');
+                // redirect based on role
+                return isAuth() && isAuth().role === 'admin' ? Router.push('/admin') : Router.push('/user');
             });
         } catch (error) {
             console.log(error);
