@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
+const expressjwt = require('express-jwt');
 const {registerEmailParams} = require('../helpers/email');
 const shortId = require('shortid');
 
@@ -107,3 +108,5 @@ exports.login = (req, res) => {
         });
     });
 };
+
+exports.requireLogin = expressjwt({secret: process.env.JWT_SECRET});
