@@ -83,3 +83,27 @@ exports.registerActivate = (req, res) => {
         });
     });
 };
+
+exports.login = (req, res) => {
+    const {email, password} = req.body;
+    User.findOne({email}).exec((err, user) => {
+        if (err || !user) {
+            return res.status(400).json({
+                error: 'No user exists with this email. Please register.'
+            });
+        }
+        if (!user.authenticate(password)) {
+            return res.status(400).json({
+                error: 'Email and password do not match.'
+            });
+        }
+        //console.log(user);
+        // generate token and send to client
+        const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
+        const {_id, name, email, role} = user;
+        return res.json({
+            token,
+            user: {_id, name, email, role}
+        });
+    });
+};
