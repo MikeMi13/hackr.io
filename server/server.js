@@ -14,6 +14,7 @@ mongoose.connect(process.env.DATABASE_CLOUD, {})
 
 // import routes
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 // apply middlewares
 app.use(morgan('dev')); // dev mode
@@ -21,6 +22,7 @@ app.use(bodyParser.json()); // parse JSON in request body
 app.use(cors({ origin: process.env.CLIENT_URL })); // allow frontend to communicate with backend API
 
 app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 
 const port = process.env.PORT || 8000;
 
