@@ -42,6 +42,7 @@ exports.create = (req, res) => {
         console.log('AWS UPLOAD RES DATA:', data);
         category.image.url = data.Location;
         category.image.key = data.Key;
+        category.postedBy = req.user._id;
 
         // save category to DB
         category.save((err, success) => {

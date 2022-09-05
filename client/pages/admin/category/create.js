@@ -1,27 +1,36 @@
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import Resizer from 'react-image-file-resizer';
+const ReactQuill = dynamic(() => import('react-quill'), {ssr: false});
+import 'react-quill/dist/quill.snow.css';
 import { API } from "../../../config";
 import { showSuccessMessage, showErrorMessage } from '../../../helpers/alerts';
 import Layout from "../../../components/Layout";
 import withAdmin from "../../withAdmin";
 
+
 const Create = ({ user, token }) => {
     const [state, setState] = useState({
         name: '',
-        content: '',
         error: '',
         success: '',
         buttonText: 'Create',
         image: ''
     });
 
+    const [content, setContent] = useState('');
     const [imageUploadText, setImageUploadText] = useState('Upload Image');
 
-    const { name, content, error, success, buttonText, image } = state;
+    const { name, error, success, buttonText, image } = state;
 
     const handleChange = (field) => (event) => {
         setState({ ...state, [field]: event.target.value, error: '', success: '' });
+    };
+
+    const handleContent = (event) => {
+        setContent(event);
+        setState({...state, success: '', error: ''});
     };
 
     const handleImage = (event) => {
@@ -66,11 +75,12 @@ const Create = ({ user, token }) => {
             setState({
                 ...state,
                 name: '',
-                content: '',
                 buttonText: 'Created',
                 image: '',
                 success: `${response.data.name} is created!`
             });
+            //console.log(state);
+            //setContent('');
             setImageUploadText('Upload Image');
         } catch (error) {
             console.log('CATEGORY CREATE ERROR:', error);
@@ -90,7 +100,14 @@ const Create = ({ user, token }) => {
             </div>
             <div className="form-group">
                 <label className="text-muted">Content</label>
-                <textarea onChange={handleChange('content')} value={content} className="form-control" required />
+                <ReactQuill
+                    value={content}
+                    onChange={handleContent}
+                    placeholder="Write something here..."
+                    theme='snow'
+                    className='pb-5 mb-3'
+                    style={{border: '1px solid #666'}}
+                />
             </div>
             <div className="form-group">
                 <label className="btn btn-outline-secondary">
