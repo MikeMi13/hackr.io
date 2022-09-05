@@ -1,37 +1,63 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
+import Resizer from 'react-image-file-resizer';
 import { API } from "../../../config";
 import { showSuccessMessage, showErrorMessage } from '../../../helpers/alerts';
 import Layout from "../../../components/Layout";
 import withAdmin from "../../withAdmin";
 
-const Create = ({user, token}) => {
+const Create = ({ user, token }) => {
     const [state, setState] = useState({
         name: '',
         content: '',
         error: '',
         success: '',
-        formData: process.browser && new FormData(), //browser API
         buttonText: 'Create',
-        imageUploadText: 'Upload Image'
+        image: ''
     });
 
-    const {name, content, error, success, formData, buttonText, imageUploadText} = state;
+    const [imageUploadText, setImageUploadText] = useState('Upload Image');
+
+    const { name, content, error, success, buttonText, image } = state;
 
     const handleChange = (field) => (event) => {
-        const value = field === 'image' ? event.target.files[0] : event.target.value;
-        const imageName = field === 'image' ? event.target.files[0].name : 'Upload Image';
-        formData.set(field, value);
-        setState({...state, [field]: value, error: '', success: '', imageUploadText: imageName});
+        setState({ ...state, [field]: event.target.value, error: '', success: '' });
+    };
+
+    const handleImage = (event) => {
+        let fileInput = false;
+        if (event.target.files[0]) {
+            fileInput = true;
+        }
+        setImageUploadText(event.target.files[0].name);
+        if (fileInput) {
+            try {
+                Resizer.imageFileResizer(
+                    event.target.files[0],
+                    300,
+                    300,
+                    "JPEG",
+                    100,
+                    0,
+                    (uri) => {
+                        //console.log(uri);
+                        setState({...state, image: uri, success: '', error: ''});
+                    },
+                    "base64"
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        }
     };
 
     const handleSubmit = async (event) => {
         // prevent page from reloading
         event.preventDefault();
-        setState({...state, buttonText: 'Creating...'});
+        setState({ ...state, buttonText: 'Creating...' });
         //console.log(...formData);
         try {
-            const response = await axios.post(`${API}/category`, formData, {
+            const response = await axios.post(`${API}/category`, {name, content, image}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -39,18 +65,17 @@ const Create = ({user, token}) => {
             console.log('CATEGORY CREATE RESPONSE:', response);
             setState({
                 ...state,
-                name:'',
-                content:'',
-                formData: '',
+                name: '',
+                content: '',
                 buttonText: 'Created',
-                imageUploadText: 'Upload Image',
+                image: '',
                 success: `${response.data.name} is created!`
             });
+            setImageUploadText('Upload Image');
         } catch (error) {
             console.log('CATEGORY CREATE ERROR:', error);
             setState({
                 ...state,
-                name: '',
                 buttonText: 'Create',
                 error: error.response.data.error
             });
@@ -70,7 +95,7 @@ const Create = ({user, token}) => {
             <div className="form-group">
                 <label className="btn btn-outline-secondary">
                     {imageUploadText}
-                    <input onChange={handleChange('image')} type="file" accept="image/*" className="form-control" hidden />
+                    <input onChange={handleImage} type="file" accept="image/*" className="form-control" hidden />
                 </label>
             </div>
             <div>
