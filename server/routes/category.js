@@ -10,7 +10,7 @@ const { requireLogin, adminMiddleware } = require('../controllers/auth');
 const { create, list, read, update, remove } = require('../controllers/category');
 
 // routes (for CRUD)
-router.post('/category', requireLogin, adminMiddleware, create);
+router.post('/category', requireLogin, adminMiddleware, categoryCreateValidator, runValidation, create);
 router.get('/categories', list);
 router.get('/category/:slug', read);
 router.put('/category/:slug', requireLogin, adminMiddleware, categoryUpdateValidator, runValidation, update);
