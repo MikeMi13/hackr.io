@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "../../../components/Layout";
 import axios from 'axios';
 import { API } from '../../../config';
@@ -29,7 +29,8 @@ const Create = () => {
     };
 
     const handleSubmit = async (e) => {
-        console.log('POST TO SERVER');
+        e.preventDefault();
+        console.table({ title, url, categories, type, medium });
     };
 
     const handleToggle = (c_id) => () => {
@@ -56,6 +57,51 @@ const Create = () => {
             </li>
         ));
     };
+
+    const handleTypeClick = (e) => {
+        setState({ ...state, type: e.target.value, success: '', error: '' });
+    };
+
+    // show types using radio button
+    const showTypes = () => (
+        <React.Fragment>
+            <div className="form-check pl-5 ml-3">
+                <label className="form-check-label">
+                    <input type="radio" onClick={handleTypeClick} checked={type === 'free'} value='free' className="form-check-input" />
+                    Free
+                </label>
+            </div>
+            <div className="form-check pl-5 ml-3">
+                <label className="form-check-label">
+                    <input type="radio" onClick={handleTypeClick} checked={type === 'paid'} value='paid' className="form-check-input" />
+                    Paid
+                </label>
+            </div>
+        </React.Fragment>
+    );
+
+
+    const handleMediumClick = (e) => {
+        setState({ ...state, medium: e.target.value, success: '', error: '' });
+    };
+
+    // show medium using radio button
+    const showMedium = () => (
+        <React.Fragment>
+            <div className="form-check pl-5 ml-3">
+                <label className="form-check-label">
+                    <input type="radio" onClick={handleMediumClick} checked={medium === 'video'} value='video' className="form-check-input" />
+                    Video
+                </label>
+            </div>
+            <div className="form-check pl-5 ml-3">
+                <label className="form-check-label">
+                    <input type="radio" onClick={handleMediumClick} checked={medium === 'book'} value='book' className="form-check-input" />
+                    Book
+                </label>
+            </div>
+        </React.Fragment>
+    );
 
     const handleTitleChange = (e) => {
         setState({ ...state, title: e.target.value, success: '', error: '' });
@@ -98,10 +144,17 @@ const Create = () => {
                             {showCategories()}
                         </ul>
                     </div>
+                    <div className="form-group">
+                        <label className="text-muted ml-4">Type</label>
+                        {showTypes()}
+                    </div>
+                    <div className="form-group">
+                        <label className="text-muted ml-4">Medium</label>
+                        {showMedium()}
+                    </div>
                 </div>
                 <div className="col-md-8">{submitLinkForm()}</div>
             </div>
-            {JSON.stringify(categories)}
         </Layout>
     )
 };
