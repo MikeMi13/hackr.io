@@ -1,4 +1,5 @@
 const Category = require('../models/category');
+const Link = require('../models/link');
 const slugify = require('slugify');
 const formidable = require('formidable');
 const { v4: uuidv4 } = require('uuid');
@@ -125,7 +126,33 @@ exports.list = (req, res) => {
 };
 
 exports.read = (req, res) => {
+    const {slug} = req.params;
+    let _limit = req.body.limit ? parseInt(req.body.limit) : 10;
+    let _skip = req.body.skip ? parseInt(req.body.skip) : 0;
 
+    Category.findOne({slug})
+        .populate('postedBy', '_id name username')
+        .exec((err, category) => {
+            if (err) {
+                return res.status(400).json({
+                    error: 'Could not load category. Please try again later.'
+                });
+            }
+            Link.find({categories: category})
+                .populate('postedBy', '_id name username')
+                .populate('categories', 'name')
+                .sort({createdAt: -1})
+                .limit(_limit)
+                .skip(_skip)
+                .exec((err, links) => {
+                    if (err) {
+                        return res.status(400).json({
+                            error: 'Could not load links. Please try again later.'
+                        });
+                    }
+                    return res.json({category, links});
+                });
+        });
 };
 
 exports.update = (req, res) => {
