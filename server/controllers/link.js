@@ -5,12 +5,8 @@ exports.create = (req, res) => {
     const {title, url, categories, type, medium} = req.body;
     //console.table({title, url, categories, type, medium});
     const slug = url;
-    let link = new Link({title, url, type, medium, slug});
+    let link = new Link({title, url, categories, type, medium, slug});
     link.postedBy = req.user._id;
-
-    // associate categories
-    let categoriesArray = categories && categories.split(',');
-    link.categories = categoriesArray;
 
     // save to DB
     link.save((err, data) => {

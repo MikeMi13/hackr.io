@@ -3,8 +3,9 @@ import Layout from "../../../components/Layout";
 import axios from 'axios';
 import { API } from '../../../config';
 import { showSuccessMessage, showErrorMessage } from '../../../helpers/alerts'
+import { getCookie, isAuth } from "../../../helpers/auth";
 
-const Create = () => {
+const Create = ({token}) => {
     const [state, setState] = useState({
         title: '',
         url: '',
@@ -30,7 +31,27 @@ const Create = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.table({ title, url, categories, type, medium });
+        //console.table({ title, url, categories, type, medium });
+        try {
+            const response = await axios.post(`${API}/link`, {title, url, categories, type, medium}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setState({...state,
+                title: '',
+                url: '',
+                success: 'Link is created!',
+                error: '',
+                loadedCategories: [],
+                categories: [],
+                type: '',
+                medium: ''
+            });
+        } catch (err) {
+            console.log('LINK SUBMIT ERROR:', err);
+            setState({...state, error: err.response.data.error});
+        }
     };
 
     const handleToggle = (c_id) => () => {
@@ -123,7 +144,9 @@ const Create = () => {
                 <input type="url" className="form-control" onChange={handleURLChange} value={url} />
             </div>
             <div>
-                <button className="btn btn-outline-primary" type="submit">Submit</button>
+                <button disabled={!token} className="btn btn-outline-primary" type="submit">
+                    {isAuth() || token ? 'Post' : 'Login To Post'}
+                </button>
             </div>
         </form>
     );
@@ -153,11 +176,20 @@ const Create = () => {
                         {showMedium()}
                     </div>
                 </div>
-                <div className="col-md-8">{submitLinkForm()}</div>
+                <div className="col-md-8">
+                    {success && showSuccessMessage(success)}
+                    {error && showErrorMessage(error)}
+                    {submitLinkForm()}
+                </div>
             </div>
         </Layout>
     )
 };
+
+Create.getInitialProps = ({req}) => {
+    const token = getCookie('token', req);
+    return {token};
+}
 
 export default Create;
 
