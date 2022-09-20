@@ -1,19 +1,56 @@
+import { useState } from 'react';
 import Layout from '../../components/Layout';
 import Link from 'next/link';
 import axios from 'axios';
+import renderHTML from 'react-render-html';
+import moment from 'moment';
 import {API} from '../../config';
 
 const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
+
+    const [allLinks, setAllLinks] = useState(links);
+
+    const listOfLinks = () => (
+        allLinks.map((link, i) => (
+            <div className='row alert alert-primary p-2'>
+                <div className='col-md-8'>
+                    <a href={link.url} target="_blank">
+                        <h5 className='pt-2'>{link.title}</h5>
+                        <h6 className='pt-2 text-danger' style={{fontSize: '12px'}}>{link.url}</h6>
+                    </a>
+                </div>
+                <div className='col-md-4 pt-2'>
+                    <span className='pull-right'>{moment(link.createdAt).fromNow()} by {link.postedBy.name}</span>
+                </div>
+                <div className='col-md-12'>
+                    <span className='badge text-dark'>{link.type} {link.medium}</span>
+                    {link.categories.map((c, i) => (<span className='badge text-success'>{c.name}</span>))}
+                </div>
+            </div>
+        ))
+    );
+
     return (
         <Layout>
             <div className='row'>
                 <div className='col-md-8'>
-                    {JSON.stringify(links)}
+                    <h1 className='display-4 font-weight-bold'>{category.name} - URL/Links</h1>
+                    <div className='lead alert alert-secondary pt-4'>{renderHTML(category.content)}</div>
                 </div>
                 <div className='col-md-4'>
-                    right sidebar
+                    <img src={category.image.url} alt={category.name} style={{width: 'auto', maxHeight: '200px'}} />
                 </div>
             </div>
+            <br />
+            <div className='row'>
+                <div className='col-md-8'>
+                    {listOfLinks()}  
+                </div>
+                <div className='col-md-4'>
+                    <h2 className='lead'>Most Popular in {category.name}</h2>
+                </div>
+            </div>
+            
         </Layout>
     );
 };
