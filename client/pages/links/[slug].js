@@ -26,7 +26,7 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
 
     const listOfLinks = () => (
         allLinks.map((link, i) => (
-            <div className='row alert alert-primary p-2'>
+            <div key={i} className='row alert alert-primary p-2'>
                 <div className='col-md-8' onClick={e => handleClick(link._id)}>
                     <a href={link.url} target="_blank">
                         <h5 className='pt-2'>{link.title}</h5>
@@ -40,7 +40,7 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
                 </div>
                 <div className='col-md-12'>
                     <span className='badge text-dark'>{link.type} {link.medium}</span>
-                    {link.categories.map((c, i) => (<span className='badge text-success'>{c.name}</span>))}
+                    {link.categories.map((c, i) => (<span key={i} className='badge text-success'>{c.name}</span>))}
                 </div>
             </div>
         ))
@@ -74,28 +74,32 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
                 </div>
             </div>
             <br />
-            <div className='row'>
+            {/* {<div className='row'>
                 <div className='col-md-8'>
                     {listOfLinks()}  
                 </div>
                 <div className='col-md-4'>
                     <h2 className='lead'>Most Popular in {category.name}</h2>
                 </div>
-            </div>
+            </div>} */}
             
             {/*<div className='text-center pt-4 pb-5'>{loadMoreButton()}</div>*/}
-
-            <div className='row'>
-                <div className='col-md-12 text-center'>
-                    <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={size > 0 && size >= limit}
-                        loader={<img src='/static/images/loading.gif' alt='loading' />}
-                    >
-                    </InfiniteScroll>
+            
+            <InfiniteScroll
+                pageStart={0}
+                loadMore={loadMore}
+                hasMore={size > 0 && size >= limit}
+                loader={<img key={0} src='/static/images/loading.gif' alt='loading' />}
+            >
+                <div className='row'>
+                    <div className='col-md-8'>
+                        {listOfLinks()}  
+                    </div>
+                    <div className='col-md-4'>
+                        <h2 className='lead'>Most Popular in {category.name}</h2>
+                    </div>
                 </div>
-            </div>
+            </InfiniteScroll>
 
         </Layout>
     );
