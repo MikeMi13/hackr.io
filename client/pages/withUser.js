@@ -7,6 +7,7 @@ const withUser = (Page) => {
     withAuthUser.getInitialProps = async (context) => {
         const token = getCookie('token', context.req);
         let user = null;
+        let userLinks = [];
         
         if (token) {
             try {
@@ -16,10 +17,12 @@ const withUser = (Page) => {
                         contentType: 'application/json'
                     }
                 });
-                user = response.data;
+                user = response.data.user;
+                userLinks = response.data.links;
             } catch (err) {
                 if (err.response.status === 401) {
                     user = null;
+                    userLinks = [];
                 }
             }
         }
@@ -37,6 +40,7 @@ const withUser = (Page) => {
                 // Otherwise just return without waiting for getInitialProps.
                 ...(Page.getInitialProps ? await Page.getInitialProps(context) : {}),
                 user,
+                userLinks,
                 token
             };
         }
