@@ -13,10 +13,20 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
     const [skip, setSkip] = useState(linksSkip);
     const [size, setSize] = useState(totalLinks);
 
+    const handleClick = async (linkId) => {
+        const response = await axios.put(`${API}/click-count`, {linkId});
+        loadUpdatedLinks();
+    }
+
+    const loadUpdatedLinks = async () => {
+        const response = await axios.post(`${API}/category/${query.slug}`);
+        setAllLinks(response.data.links);
+    };
+
     const listOfLinks = () => (
         allLinks.map((link, i) => (
             <div className='row alert alert-primary p-2'>
-                <div className='col-md-8'>
+                <div className='col-md-8' onClick={e => handleClick(link._id)}>
                     <a href={link.url} target="_blank">
                         <h5 className='pt-2'>{link.title}</h5>
                         <h6 className='pt-2 text-danger' style={{fontSize: '12px'}}>{link.url}</h6>
@@ -24,6 +34,8 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
                 </div>
                 <div className='col-md-4 pt-2'>
                     <span className='pull-right'>{moment(link.createdAt).fromNow()} by {link.postedBy.name}</span>
+                    <br />
+                    <span className='badge text-secondary pull-right'>{link.clicks} clicks</span>
                 </div>
                 <div className='col-md-12'>
                     <span className='badge text-dark'>{link.type} {link.medium}</span>
