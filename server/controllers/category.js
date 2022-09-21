@@ -156,9 +156,96 @@ exports.read = (req, res) => {
 };
 
 exports.update = (req, res) => {
+    const {slug} = req.params;
+    const {name, image, content} = req.body;
 
+    Category.findOneAndUpdate({slug}, {name, content}, {new: true}).exec((err, updated) => {
+        if (err) {
+            return res.status(400).json({
+                error: 'Could not update category.'
+            });
+        }
+
+        if (image) {
+            // remove the existing image from S3 before uploading the new one
+            const deleteParams = {
+                Bucket: 'learnwebapp',
+                Key: `category/${updated.image.key}`
+            };
+
+            S3.deleteObject(deleteParams, (err, data) => {
+                if (err) {
+                    console.log('S3 DELETE ERROR DURING UPDATE', err);
+                } else {
+                    console.log('S3 DELETE SUCCESSFUL DURING UPDATE', data);
+                }
+            });
+
+            const base64Data = new Buffer.from(image.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+            const type = image.split(';')[0].split('/')[1];
+            // upload new image
+            const params = {
+                Bucket: 'learnwebapp',
+                Key: `category/${uuidv4()}.${type}`,
+                Body: base64Data,
+                ACL: 'public-read',
+                ContentEncoding: 'base64',
+                ContentType: `image/${type}`
+            };
+
+            S3.upload(params, (err, data) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(400).json({
+                        error: 'Upload to S3 failed'
+                    });
+                }
+                console.log('AWS UPLOAD RES DATA:', data);
+                updated.image.url = data.Location;
+                updated.image.key = data.Key;
+        
+                // save category to DB
+                updated.save((err, success) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(400).json({
+                            error: 'Error saving category to DB'
+                        });
+                    }
+                    return res.json(success);
+                });
+            });
+        } else {
+            return res.json(updated);
+        }
+    });
 };
 
 exports.remove = (req, res) => {
+    const {slug} = req.params;
 
+    Category.findOneAndRemove({slug}).exec((err, data) => {
+        if (err) {
+            return res.status(400).json({
+                error: 'Could not delete category.'
+            });
+        }
+
+        const deleteParams = {
+            Bucket: 'learnwebapp',
+            Key: `category/${data.image.key}`
+        };
+
+        S3.deleteObject(deleteParams, (err, data) => {
+            if (err) {
+                console.log('S3 DELETE ERROR DURING DELETE', err);
+            } else {
+                console.log('S3 DELETE SUCCESSFUL DURING DELETE', data);
+            }
+        });
+
+        return res.json({
+            message: 'Category deleted successfully.'
+        });
+    });
 };
