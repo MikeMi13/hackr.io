@@ -24,8 +24,27 @@ const Read = ({user, token}) => {
         setState({...state, categories: response.data});
     };
 
-    const confirmDelete = (slug) => {
-        console.log('delete >', slug);
+    const confirmDelete = (e, slug) => {
+        e.preventDefault();
+        //console.log('delete >', slug);
+        let answer = window.confirm(`Are you sure you want to delete ${slug} ?`);
+        if (answer) {
+            handleDelete(slug);
+        }
+    };
+
+    const handleDelete = async (slug) => {
+        try {
+            const response = await axios.delete(`${API}/category/${slug}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            console.log('CATEGORY DELETE SUCCESS', response);
+            loadCategories();
+        } catch (error) {
+            console.log('CATEGORY DELETE', error);
+        }
     }
 
     const listCategories = () => categories.map((c, i) => (
@@ -43,7 +62,7 @@ const Read = ({user, token}) => {
                             <Link href={`/admin/category/${c.slug}`}>
                                 <button className="btn btn-sm btn-outline-success btn-block mb-1">Update</button>
                             </Link>
-                            <button onClick={() => confirmDelete(c.slug)} className="btn btn-sm btn-outline-danger btn-block">
+                            <button onClick={(e) => confirmDelete(e, c.slug)} className="btn btn-sm btn-outline-danger btn-block">
                                 Delete
                             </button>
                         </div>
