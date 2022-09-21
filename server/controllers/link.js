@@ -36,11 +36,32 @@ exports.read = (req, res) => {
 };
 
 exports.update = (req, res) => {
+    const {id} = req.params;
+    const {title, url, categories, type, medium} = req.body;
 
+    Link.findOneAndUpdate({_id: id}, {title, url, categories, type, medium}, {new: true}).exec((err, updated) => {
+        if (err) {
+            return res.status(400).json({
+                error: 'Error updating link.'
+            });
+        }
+
+        return res.json(updated);
+    })
 };
 
 exports.remove = (req, res) => {
-
+    const {id} = req.params;
+    Link.findOneAndRemove({_id: id}).exec((err, data) => {
+        if (err) {
+            return res.status(400).json({
+                error: 'Error removing link.'
+            });
+        }
+        return res.json({
+            message: 'Link removed successfully.'
+        });
+    });
 };
 
 exports.clickCount = (req, res) => {

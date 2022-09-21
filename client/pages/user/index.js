@@ -1,5 +1,7 @@
 import Layout from '../../components/Layout';
 import Link from 'next/link';
+import axios from 'axios';
+import { API } from '../../config';
 import moment from 'moment';
 import withUser from '../withUser';
 import Router from 'next/router';
