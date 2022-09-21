@@ -56,7 +56,7 @@ const User = ({user, userLinks, token}) => {
                 <button onClick={(e) => confirmDelete(e, l._id)} className='btn btn-danger btn-sm float-right'>
                     Delete
                 </button>
-                <Link href={`/user/link/${l.slug}`}>
+                <Link href={`/user/link/${l._id}`}>
                     <button className='btn btn-success btn-sm float-right'>
                         Update
                     </button>

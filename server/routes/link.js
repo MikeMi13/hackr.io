@@ -13,7 +13,7 @@ const { create, list, read, update, remove, clickCount } = require('../controlle
 router.post('/link', requireLogin, authMiddleware, linkCreateValidator, runValidation, create);
 router.get('/links', list);
 router.put('/click-count', clickCount);
-router.get('/link/:slug', read);
+router.get('/link/:id', read);
 router.put('/link/:id', requireLogin, authMiddleware, linkUpdateValidator, runValidation, update);
 router.delete('/link/:id', requireLogin, authMiddleware, remove);
 
