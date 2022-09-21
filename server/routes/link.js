@@ -7,11 +7,12 @@ const { runValidation } = require('../validators/index');
 
 // controllers
 const { requireLogin, authMiddleware } = require('../controllers/auth');
-const { create, list, read, update, remove } = require('../controllers/link');
+const { create, list, read, update, remove, clickCount } = require('../controllers/link');
 
 // routes (for CRUD)
 router.post('/link', requireLogin, authMiddleware, linkCreateValidator, runValidation, create);
 router.get('/links', list);
+router.put('/click-count', clickCount);
 router.get('/link/:slug', read);
 router.put('/link/:slug', requireLogin, authMiddleware, linkUpdateValidator, runValidation, update);
 router.delete('/link/:slug', requireLogin, authMiddleware, remove);
