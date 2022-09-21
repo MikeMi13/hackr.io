@@ -10,19 +10,20 @@ import Layout from "../../../components/Layout";
 import withAdmin from "../../withAdmin";
 
 
-const Create = ({ user, token }) => {
+const Update = ({ oldCategory, token }) => {
     const [state, setState] = useState({
-        name: '',
+        name: oldCategory.name,
         error: '',
         success: '',
-        buttonText: 'Create',
+        buttonText: 'Update',
+        imagePreview: oldCategory.image.url,
         image: ''
     });
 
-    const [content, setContent] = useState('');
-    const [imageUploadText, setImageUploadText] = useState('Upload Image');
+    const [content, setContent] = useState(oldCategory.content);
+    const [imageUploadText, setImageUploadText] = useState('Update Image');
 
-    const { name, error, success, buttonText, image } = state;
+    const { name, error, success, buttonText, imagePreview, image } = state;
 
     const handleChange = (field) => (event) => {
         setState({ ...state, [field]: event.target.value, error: '', success: '' });
@@ -63,36 +64,34 @@ const Create = ({ user, token }) => {
     const handleSubmit = async (event) => {
         // prevent page from reloading
         event.preventDefault();
-        setState({ ...state, buttonText: 'Creating...' });
+        setState({ ...state, buttonText: 'Updating...' });
         //console.log(...formData);
         try {
-            const response = await axios.post(`${API}/category`, {name, content, image}, {
+            const response = await axios.put(`${API}/category/${oldCategory.slug}`, {name, content, image}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            console.log('CATEGORY CREATE RESPONSE:', response);
-            setContent('');
+            console.log('CATEGORY UPDATE RESPONSE:', response);
             setState({
                 ...state,
-                name: '',
-                buttonText: 'Created',
-                image: '',
-                success: `${response.data.name} is created!`
+                buttonText: 'Updated',
+                imagePreview: response.data.image.url,
+                success: `${response.data.name} is updated!`
             });
             //console.log(state);
-            setImageUploadText('Upload Image');
+            setImageUploadText('Update Image');
         } catch (error) {
-            console.log('CATEGORY CREATE ERROR:', error);
+            console.log('CATEGORY UPDATE ERROR:', error);
             setState({
                 ...state,
-                buttonText: 'Create',
+                buttonText: 'Update',
                 error: error.response.data.error
             });
         }
     };
 
-    const createCategoryForm = () => (
+    const updateCategoryForm = () => (
         <form onSubmit={handleSubmit}>
             <div className="form-group">
                 <label className="text-muted">Name</label>
@@ -111,7 +110,10 @@ const Create = ({ user, token }) => {
             </div>
             <div className="form-group">
                 <label className="btn btn-outline-secondary">
-                    {imageUploadText}
+                    {imageUploadText}{' '}
+                    <span>
+                        <img src={imagePreview} alt="image" height="20" />
+                    </span>
                     <input onChange={handleImage} type="file" accept="image/*" className="form-control" hidden />
                 </label>
             </div>
@@ -127,15 +129,20 @@ const Create = ({ user, token }) => {
         <Layout>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <h1>Create Category</h1>
+                    <h1>Update Category</h1>
                     <br />
                     {success && showSuccessMessage(success)}
                     {error && showErrorMessage(error)}
-                    {createCategoryForm()}
+                    {updateCategoryForm()}
                 </div>
             </div>
         </Layout>
     );
 };
 
-export default withAdmin(Create);
+Update.getInitialProps = async ({req, query, token}) => {
+    const response = await axios.post(`${API}/category/${query.slug}`);
+    return {oldCategory: response.data.category, token};
+};
+
+export default withAdmin(Update);
