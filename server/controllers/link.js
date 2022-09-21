@@ -21,13 +21,22 @@ exports.create = (req, res) => {
 };
 
 exports.list = (req, res) => {
-    Link.find({}).exec((err, data) => {
+    let _limit = req.body.limit ? parseInt(req.body.limit) : 10;
+    let _skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
+    Link.find({})
+    .populate('postedBy', 'name')
+    .populate('categories', 'name slug')
+    .sort({createdAt: -1})
+    .skip(_skip)
+    .limit(_limit)
+    .exec((err, data) => {
         if (err) {
             return res.status(400).json({
-                error: 'Could not load links. Please try again later.'
+                error: 'Could not list links. Please try again later.'
             });
         }
-        res.json(data);
+        return res.json(data);
     });
 };
 
