@@ -4,6 +4,7 @@ import axios from 'axios';
 import { showSuccessMessage, showErrorMessage } from '../../../helpers/alerts';
 import { API } from '../../../config';
 import withUser from '../../withUser';
+import {updateUser} from '../../../helpers/auth';
 
 const Profile = ({user, token}) => {
     const[state, setState] = useState({
@@ -73,10 +74,12 @@ const Profile = ({user, token}) => {
                 }
             });
             console.log(response);
-            setState({
-                ...state,
-                buttonText: 'Updated',
-                success: 'Profile updated successfully.',
+            updateUser(response.data, () => {
+                setState({
+                    ...state,
+                    buttonText: 'Updated',
+                    success: 'Profile updated successfully.',
+                });
             });
         } catch (error) {
             console.log(error);
