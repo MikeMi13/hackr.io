@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import Layout from '../../components/Layout';
 import Link from 'next/link';
+import Head from 'next/head';
 import axios from 'axios';
 import renderHTML from 'react-render-html';
 import moment from 'moment';
-import {API} from '../../config';
+import {API, APP_NAME} from '../../config';
 import InfiniteScroll from 'react-infinite-scroller';
 
 const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
@@ -14,6 +15,17 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
     const [skip, setSkip] = useState(linksSkip);
     const [size, setSize] = useState(totalLinks);
     const [popular, setPopular] = useState([]);
+
+    const head = () => (
+        <Head>
+            <title>
+                {category.name} | {APP_NAME}
+            </title>
+            <meta name='description' content={category.content.substring(0, 160)} />
+            <meta property='og:title' content={category.name} />
+            <meta property='og:image' content={category.image.url} />
+        </Head>
+    );
 
     useEffect(() => {
         loadPopularLinks();
@@ -95,36 +107,39 @@ const Links = ({query, category, links, totalLinks, linksLimit, linksSkip}) => {
     };
 
     return (
-        <Layout>
-            <div className='row'>
-                <div className='col-md-8'>
-                    <h1 className='display-4 font-weight-bold'>{category.name} - URL/Links</h1>
-                    <div className='lead alert alert-secondary pt-4'>{renderHTML(category.content)}</div>
-                </div>
-                <div className='col-md-4'>
-                    <img src={category.image.url} alt={category.name} style={{width: 'auto', maxHeight: '200px'}} />
-                </div>
-            </div>
-            <br />
-            
-            <InfiniteScroll
-                pageStart={0}
-                loadMore={loadMore}
-                hasMore={size > 0 && size >= limit}
-                loader={<img key={0} src='/static/images/loading.gif' alt='loading' />}
-            >
+        <Fragment>
+            {head()}
+            <Layout>
                 <div className='row'>
                     <div className='col-md-8'>
-                        {listOfLinks()}  
+                        <h1 className='display-4 font-weight-bold'>{category.name} - URL/Links</h1>
+                        <div className='lead alert alert-secondary pt-4'>{renderHTML(category.content)}</div>
                     </div>
                     <div className='col-md-4'>
-                        <h2 className='lead'>Most Popular in {category.name}</h2>
-                        {listOfPopularLinks()}
+                        <img src={category.image.url} alt={category.name} style={{width: 'auto', maxHeight: '200px'}} />
                     </div>
                 </div>
-            </InfiniteScroll>
+                <br />
+                
+                <InfiniteScroll
+                    pageStart={0}
+                    loadMore={loadMore}
+                    hasMore={size > 0 && size >= limit}
+                    loader={<img key={0} src='/static/images/loading.gif' alt='loading' />}
+                >
+                    <div className='row'>
+                        <div className='col-md-8'>
+                            {listOfLinks()}  
+                        </div>
+                        <div className='col-md-4'>
+                            <h2 className='lead'>Most Popular in {category.name}</h2>
+                            {listOfPopularLinks()}
+                        </div>
+                    </div>
+                </InfiniteScroll>
 
-        </Layout>
+            </Layout>
+        </Fragment>
     );
 };
 
