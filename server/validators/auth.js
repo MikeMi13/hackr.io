@@ -10,7 +10,11 @@ exports.userRegisterValidator = [
         .withMessage('Email address is invalid.'),
     check('password')
         .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters long.')
+        .withMessage('Password must be at least 6 characters long.'),
+    check('categories')
+        .not()
+        .isEmpty()
+        .withMessage('Pick at least one category.')
 ];
 
 exports.userLoginValidator = [
