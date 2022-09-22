@@ -41,3 +41,10 @@ exports.resetPasswordValidator = [
         .isEmpty()
         .withMessage('Token is required.')
 ];
+
+exports.userUpdateValidator = [
+    check('name')
+        .not()
+        .isEmpty()
+        .withMessage('Name is required.')
+];
