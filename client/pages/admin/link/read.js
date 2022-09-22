@@ -57,7 +57,7 @@ const Links = ({links, totalLinks, linksLimit, linksSkip, token}) => {
                     <span className='badge text-dark'>{link.type} {link.medium}</span>
                     {link.categories.map((c, i) => (<span key={i} className='badge text-success'>{c.name}</span>))}
                     <button onClick={(e) => confirmDelete(e, link._id)} className='btn btn-danger btn-sm float-right'>Delete</button>
-                    <Link href={`/admin/link/${link._id}`}>
+                    <Link href={`/user/link/${link._id}`}>
                         <button className='btn btn-success btn-sm float-right'>Update</button>
                     </Link>
                 </div>
